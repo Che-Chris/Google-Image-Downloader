@@ -1,4 +1,5 @@
 import requests
+import os
 
 from config import API_KEY, CX
 
@@ -15,5 +16,16 @@ r = requests.get(endpoint, params=payload)
 
 items = r.json()['items']
 
-for item in items:
-    print(item['link'])
+for i, item in enumerate(items, start=1):
+    filename = item['link'].split('/')[-1]
+
+    if not os.path.isdir("./img/{}".format(query)):
+        os.mkdir("./img/{}".format(query))
+
+    filepath = "./img/{}/{}".format(query, filename)
+
+    img_file = requests.get(item['link'], stream=True)
+    with open(filepath, 'wb') as f:
+        for chunk in img_file.iter_content(chunk_size=1024):
+            if chunk:
+                f.write(chunk)
